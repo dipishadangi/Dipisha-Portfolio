@@ -18,11 +18,23 @@ if (!process.env.DATABASE_URL) {
 const connectionString = process.env.DATABASE_URL ?? '';
 const isLocal = /localhost|127\.0\.0\.1/.test(connectionString);
 
+/**
+ * A long-running server keeps a handful of connections open and reuses them.
+ * On Vercel each request may land on its own short-lived instance, so a large
+ * pool per instance would exhaust the database's connection limit under any
+ * real traffic — one connection each, closed quickly, is the right shape.
+ *
+ * For serverless, point DATABASE_URL at Supabase's *transaction* pooler on
+ * port 6543 rather than the session pooler on 5432.
+ */
+const isServerless = Boolean(process.env.VERCEL);
+
 export const pool = new Pool({
   connectionString,
   ssl: isLocal ? false : { rejectUnauthorized: false },
-  max: 10,
-  idleTimeoutMillis: 30_000,
+  max: isServerless ? 1 : 10,
+  idleTimeoutMillis: isServerless ? 5_000 : 30_000,
+  connectionTimeoutMillis: 10_000,
 });
 
 pool.on('error', (error) => {

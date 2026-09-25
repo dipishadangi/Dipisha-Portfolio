@@ -153,9 +153,16 @@ If the database URL is ever pasted somewhere public, reset it in Supabase under
 
 ## Deploying
 
+The same Express app runs two ways. `server/src/app.js` builds and exports it
+with no opinion about how it is served; `server/src/index.js` puts it behind a
+port, and `api/index.js` hands it to Vercel as a serverless function. There is
+only ever one copy of the routing.
+
+### Render (or any host that runs a process)
+
 The client builds to static files and the server hosts them, so the whole
 thing runs as one Node service. [`render.yaml`](render.yaml) sets it up as a
-Render blueprint; for any other host the two commands are:
+blueprint; for any other host the two commands are:
 
 ```bash
 npm install && npm run build
@@ -182,6 +189,35 @@ rather than falling back to a known development value.
 Uploaded images go to Supabase Storage rather than this server's disk, so a
 host that gives the container a fresh filesystem on each deploy loses nothing.
 There is no persistent-disk setup to do.
+
+### Vercel
+
+[`vercel.json`](vercel.json) serves `client/dist` from the CDN and rewrites
+`/api/*` to the single function in [`api/index.js`](api/index.js). Import the
+repo at vercel.com/new, leave the framework preset as **Other**, add the same
+environment variables, and deploy.
+
+Two differences matter, and both are handled in code:
+
+- **Use the transaction pooler.** Point `DATABASE_URL` at Supabase's pooler on
+  port **6543**, not 5432. Each request can land on its own instance, so the
+  connection pool is capped at one per instance (`server/src/db.js`); the
+  session pooler would run out of connections under load.
+- **Uploads are capped at 4MB, not 10.** A serverless function rejects request
+  bodies over 4.5MB before any of this code runs, so the limit is lowered when
+  `VERCEL` is set, and the error says so rather than surfacing an opaque 413.
+
+One thing is *not* handled: the login and contact-form rate limits are held in
+memory, so on Vercel each instance counts separately and the limits are looser
+than they look. Render, being one process, enforces them exactly. If the site
+ever attracts real abuse on Vercel, move that counter into Postgres.
+
+`/api/health` reports which runtime answered, so it is obvious which
+deployment you are looking at:
+
+```json
+{"ok":true,"database":"connected","storage":"bucket \"DIPISHA\"","runtime":"vercel"}
+```
 
 ---
 
