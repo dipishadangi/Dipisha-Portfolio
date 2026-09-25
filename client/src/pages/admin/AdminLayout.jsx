@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { usePageMeta } from '../../lib/usePageMeta';
 import { Burst } from '../../components/art/Illustrations';
 import { Button, Loading, cx } from '../../components/ui';
+import { MenuIcon } from '../../components/ui/MenuIcon';
 
 const LINKS = [
   { to: '/admin', label: 'Dashboard', end: true },
@@ -205,10 +206,10 @@ export function AdminLayout() {
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="btn btn-icon size-10 lg:hidden"
-            aria-label="Menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
           >
-            ☰
+            <MenuIcon />
           </button>
         </div>
       </header>

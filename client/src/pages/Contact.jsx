@@ -85,7 +85,7 @@ export function Contact() {
                         maxLength={120}
                         autoComplete="name"
                         className="field"
-                        placeholder="Jane Doe"
+                        placeholder="Ram Bahadur"
                       />
                     </label>
 
@@ -98,7 +98,7 @@ export function Contact() {
                         maxLength={200}
                         autoComplete="email"
                         className="field"
-                        placeholder="jane@studio.com"
+                        placeholder="ram@example.com"
                       />
                     </label>
                   </div>

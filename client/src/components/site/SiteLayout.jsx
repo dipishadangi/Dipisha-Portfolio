@@ -6,6 +6,7 @@ import { Burst } from '../art/Illustrations';
 import { SocialLinks } from './SocialLinks';
 import { MotionToggle } from './MotionToggle';
 import { Button, Dot, cx } from '../ui';
+import { MenuIcon } from '../ui/MenuIcon';
 
 const NAV = [
   { to: '/', label: 'Home', end: true },
@@ -96,26 +97,7 @@ function Header({ profile }) {
             aria-label={open ? 'Close menu' : 'Open menu'}
             className="btn btn-icon md:hidden"
           >
-            <span className="relative block h-3.5 w-5">
-              <span
-                className={cx(
-                  'absolute left-0 h-[3px] w-5 rounded-full bg-ink transition-all',
-                  open ? 'top-1.5 rotate-45' : 'top-0',
-                )}
-              />
-              <span
-                className={cx(
-                  'absolute top-1.5 left-0 h-[3px] w-5 rounded-full bg-ink transition-opacity',
-                  open && 'opacity-0',
-                )}
-              />
-              <span
-                className={cx(
-                  'absolute left-0 h-[3px] w-5 rounded-full bg-ink transition-all',
-                  open ? 'top-1.5 -rotate-45' : 'top-3',
-                )}
-              />
-            </span>
+            <MenuIcon />
           </button>
         </div>
       </div>
