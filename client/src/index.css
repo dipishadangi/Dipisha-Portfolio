@@ -1,0 +1,571 @@
+@import 'tailwindcss';
+
+/* ===========================================================================
+   Flat, outlined, illustrative.
+   Thick black strokes, flat colour, generous rounding. No gradients, no
+   shadows, no bevels — everything is drawn, the way the illustrations are.
+   =========================================================================== */
+
+@theme {
+  --color-ink: #111111;
+  --color-ink-soft: #4a4a52;
+  --color-ink-faint: #85858f;
+
+  --color-paper: #ffffff;
+  --color-cream: #fff8ed;
+
+  --color-coral: #ff8573;
+  --color-coral-deep: #f2604a;
+  --color-indigo: #4b45e8;
+  --color-indigo-deep: #3a34cc;
+  --color-yellow: #ffc61a;
+  --color-lavender: #c8bfff;
+  --color-lavender-soft: #ded8ff;
+  --color-sky: #6fa8e8;
+  --color-mint: #7ad3a8;
+
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  --radius-block: 22px;
+  --radius-card: 16px;
+
+  --stroke: 3px;
+}
+
+/* Everything below lives in Tailwind's own cascade layers. That ordering
+   matters: utilities come after components, so a `hidden` or `md:hidden` on a
+   `.btn` still wins even though `.btn` sets its own `display`. */
+
+@layer base {
+  /* -------------------------------------------------------------- base --- */
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin: 0;
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: var(--stroke) solid var(--color-indigo);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+}
+
+@layer components {
+
+/* --------------------------------------------------------------- blocks --- */
+
+/* The basic unit: a flat block with a hard black outline. */
+.block {
+  border: var(--stroke) solid var(--color-ink);
+  border-radius: var(--radius-block);
+  background: var(--color-paper);
+}
+
+.block-sm {
+  border: var(--stroke) solid var(--color-ink);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+}
+
+.fill-coral {
+  background: var(--color-coral);
+}
+.fill-indigo {
+  background: var(--color-indigo);
+  color: var(--color-paper);
+}
+.fill-yellow {
+  background: var(--color-yellow);
+}
+.fill-lavender {
+  background: var(--color-lavender);
+}
+.fill-cream {
+  background: var(--color-cream);
+}
+.fill-ink {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* A block that reacts when you point at it. Movement, never a shadow. */
+.block-hover {
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.3, 0.64, 1),
+    background-color 180ms ease;
+}
+.block-hover:hover {
+  transform: translateY(-5px);
+}
+
+/* -------------------------------------------------------------- buttons --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: var(--stroke) solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 140ms cubic-bezier(0.34, 1.3, 0.64, 1),
+    background-color 140ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-ink {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.btn-coral {
+  background: var(--color-coral);
+}
+.btn-yellow {
+  background: var(--color-yellow);
+}
+.btn-indigo {
+  background: var(--color-indigo);
+  color: var(--color-paper);
+}
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  border-width: 2px;
+}
+.btn-icon {
+  padding: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------- chips --- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+/* --------------------------------------------------------------- inputs --- */
+
+.field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: var(--stroke) solid var(--color-ink);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  transition: background-color 140ms ease;
+}
+
+.field::placeholder {
+  color: var(--color-ink-faint);
+}
+
+.field:focus {
+  outline: none;
+  background: var(--color-lavender-soft);
+}
+
+select.field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+/* --------------------------------------------------------------- layout --- */
+
+.shell {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .shell {
+    padding-inline: 2rem;
+  }
+}
+
+/* A hard rule, the same weight as every other stroke. */
+.rule {
+  height: var(--stroke);
+  background: var(--color-ink);
+  border-radius: 999px;
+}
+
+/* --------------------------------------------------------------- motion --- */
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* The duration is set inline from the measured width, so the band travels at
+   a constant speed however many skills there are. */
+.marquee-track {
+  animation: marquee 32s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 14s linear infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.bob {
+  animation: bob 4.5s ease-in-out infinite;
+}
+
+/* Entrance: a block drops in and settles, with a touch of overshoot. */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pop-in {
+  animation: pop-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Each burst in the grid springs out from nothing, with a spin. */
+@keyframes burst-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-60deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.12) rotate(8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* The wave that runs across the grid when you point at it. */
+@keyframes burst-wave {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.22) rotate(22deg);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.wiggle-hover:hover {
+  animation: wiggle 520ms ease-in-out;
+}
+
+/* The yellow bar behind her surname, drawn left to right. */
+@keyframes underline-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.underline-draw {
+  transform-origin: left center;
+  animation: underline-draw 700ms 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* A ring that pushes outwards and fades — used on the "hover me" hint. */
+@keyframes ping-ring {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.85);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.ping-ring {
+  animation: ping-ring 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Headings arrive a word at a time, each rising out of its own clipped line. */
+@keyframes word-rise {
+  from {
+    transform: translateY(110%) rotate(4deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.word-line {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* Room for descenders and for the slight rotation, so nothing is clipped
+     once the word has settled. */
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.word-rise {
+  display: inline-block;
+  animation: word-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Decorative shapes drifting behind the content. */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(8deg);
+  }
+}
+
+@keyframes float-x {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(16px) rotate(-10deg);
+  }
+}
+
+.float-y {
+  animation: float-y 7s ease-in-out infinite;
+}
+.float-x {
+  animation: float-x 9s ease-in-out infinite;
+}
+
+/* The pointer in the split-screen drawing taps the button, over and over. */
+@keyframes cursor-tap {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  35% {
+    transform: translate(-5px, 9px) scale(1);
+  }
+  50% {
+    transform: translate(-5px, 9px) scale(0.82);
+  }
+  68% {
+    transform: translate(-5px, 9px) scale(1);
+  }
+}
+
+.cursor-tap {
+  animation: cursor-tap 3.4s ease-in-out infinite;
+}
+
+/* A ripple where the pointer lands. */
+@keyframes tap-ring {
+  0%,
+  45% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+.tap-ring {
+  animation: tap-ring 3.4s ease-out infinite;
+}
+
+/* The reading-progress bar pinned to the very top of the window. */
+.progress-bar {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  height: 5px;
+  background: var(--color-indigo);
+  border-bottom: 2px solid var(--color-ink);
+  z-index: 60;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* A new route arrives rather than simply appearing. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 560ms ease,
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Motion is on by default and controlled by the switch in the footer, not by
+   the operating system's setting — see src/lib/motion.js for why. Turning it
+   off here stops every animation and transition on the page at once. */
+:root[data-motion='off'] *,
+:root[data-motion='off'] *::before,
+:root[data-motion='off'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+:root[data-motion='off'] .reveal {
+  opacity: 1;
+  transform: none;
+}
+}
