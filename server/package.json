@@ -12,7 +12,8 @@
     "create:admin": "node src/scripts/createAdmin.js",
     "smoke": "node src/scripts/smoke.js",
     "check:revoke": "node src/scripts/revokeCheck.js",
-    "migrate:storage": "node src/scripts/migrateToStorage.js"
+    "migrate:storage": "node src/scripts/migrateToStorage.js",
+    "check:cors": "node src/scripts/corsCheck.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

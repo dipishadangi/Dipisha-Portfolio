@@ -153,10 +153,8 @@ If the database URL is ever pasted somewhere public, reset it in Supabase under
 
 ## Deploying
 
-The same Express app runs two ways. `server/src/app.js` builds and exports it
-with no opinion about how it is served; `server/src/index.js` puts it behind a
-port, and `api/index.js` hands it to Vercel as a serverless function. There is
-only ever one copy of the routing.
+There are two arrangements, and the repo supports both. The API always runs as
+a long-lived Node process; what changes is whether it also serves the site.
 
 ### Render (or any host that runs a process)
 
@@ -190,34 +188,41 @@ Uploaded images go to Supabase Storage rather than this server's disk, so a
 host that gives the container a fresh filesystem on each deploy loses nothing.
 There is no persistent-disk setup to do.
 
-### Vercel
+### Vercel (front end only)
 
-[`vercel.json`](vercel.json) serves `client/dist` from the CDN and rewrites
-`/api/*` to the single function in [`api/index.js`](api/index.js). Import the
-repo at vercel.com/new, leave the framework preset as **Other**, add the same
-environment variables, and deploy.
+The other arrangement: Vercel serves the built site from its CDN, and the
+API stays on Render. [`vercel.json`](vercel.json) builds `client/dist` and
+sends every unknown path to `index.html` so the client router handles deep
+links. Import the repo at vercel.com/new and leave the framework preset as
+**Other**.
 
-Two differences matter, and both are handled in code:
+Two variables, one on each side:
 
-- **Use the transaction pooler.** Point `DATABASE_URL` at Supabase's pooler on
-  port **6543**, not 5432. Each request can land on its own instance, so the
-  connection pool is capped at one per instance (`server/src/db.js`); the
-  session pooler would run out of connections under load.
-- **Uploads are capped at 4MB, not 10.** A serverless function rejects request
-  bodies over 4.5MB before any of this code runs, so the limit is lowered when
-  `VERCEL` is set, and the error says so rather than surfacing an opaque 413.
+| Where | Variable | Value |
+| --- | --- | --- |
+| Vercel | `VITE_API_URL` | `https://your-api.onrender.com` (origin only, no `/api`) |
+| Render | `CLIENT_ORIGIN` | `https://your-site.vercel.app,https://*.vercel.app` |
 
-One thing is *not* handled: the login and contact-form rate limits are held in
-memory, so on Vercel each instance counts separately and the limits are looser
-than they look. Render, being one process, enforces them exactly. If the site
-ever attracts real abuse on Vercel, move that counter into Postgres.
+`CLIENT_ORIGIN` is not optional. The API only answers browsers from the
+origins listed there, and it defaults to localhost — without it every request
+from Vercel is blocked by CORS.
 
-`/api/health` reports which runtime answered, so it is obvious which
-deployment you are looking at:
+Entries may contain one `*`, which matches a single label and never a dot, so
+`https://*.vercel.app` covers the fresh subdomain Vercel gives each preview
+deploy without also matching `https://evil.vercel.app.attacker.com`. Check
+what a running server actually accepts with:
 
-```json
-{"ok":true,"database":"connected","storage":"bucket \"DIPISHA\"","runtime":"vercel"}
+```bash
+npm run check:cors
 ```
+
+`VITE_API_URL` is read at **build** time, not run time — Vite bakes it into
+the bundle. Changing it means redeploying, not just restarting.
+
+**Render's free tier sleeps after 15 minutes idle.** The page arrives from
+Vercel instantly and then waits up to a minute for the API to wake, on every
+visit after a quiet spell. On a paid plan this does not happen; on the free
+plan, hosting both halves on Render avoids the split but not the sleep.
 
 ---
 

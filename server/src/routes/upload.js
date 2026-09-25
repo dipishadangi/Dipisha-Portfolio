@@ -18,15 +18,7 @@ const ALLOWED_TYPES = new Set([
 
 export const uploadRouter = Router();
 
-/**
- * A Vercel serverless function rejects request bodies over 4.5MB before any
- * of this code runs, so the limit is lowered there to keep the failure
- * legible: multer's "file too large" message rather than an opaque 413 from
- * the platform. Anywhere else the bucket's own 10MB cap applies.
- */
-export const MAX_UPLOAD_BYTES = process.env.VERCEL
-  ? 4 * 1024 * 1024
-  : 10 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 const upload = multer({
   storage: multer.memoryStorage(),

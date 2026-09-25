@@ -30,30 +30,39 @@ export const origins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(cors({ origin: origins, credentials: false }));
-app.use(express.json({ limit: '1mb' }));
-app.set('trust proxy', 1);
-
 /**
- * Vercel rewrites `/api/anything` to this one function, and depending on how
- * the rewrite resolves, the path can arrive already stripped of its `/api`
- * prefix. The routes below are all mounted under `/api`, so put it back when
- * it is missing rather than mounting everything twice.
- *
- * Strictly scoped to Vercel: there the function only ever receives API
- * traffic, because the static files and the client-side routes are served
- * from the CDN. Anywhere else this process also serves the site, and
- * rewriting `/work/some-project` into `/api/work/some-project` would break
- * every deep link.
+ * Entries may contain a single `*` wildcard, so that Vercel's preview deploys
+ * — which get a fresh subdomain every push — can be allowed in one go with
+ * `https://*.vercel.app`. The wildcard matches one label only, never a dot,
+ * so it cannot be widened into a different domain.
  */
-if (process.env.VERCEL) {
-  app.use((req, _res, next) => {
-    if (!req.url.startsWith('/api')) {
-      req.url = `/api${req.url === '/' ? '' : req.url}`;
-    }
-    next();
+function originAllowed(requestOrigin) {
+  // No Origin header: same-origin navigation, curl, or a server-to-server
+  // call. There is nothing to protect against here — CORS only restrains
+  // browsers acting on behalf of another site.
+  if (!requestOrigin) return true;
+
+  return origins.some((allowed) => {
+    if (!allowed.includes('*')) return allowed === requestOrigin;
+
+    const pattern = allowed
+      .split('*')
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('[^.]+');
+
+    return new RegExp(`^${pattern}$`).test(requestOrigin);
   });
 }
+
+app.use(
+  cors({
+    origin: (requestOrigin, callback) =>
+      callback(null, originAllowed(requestOrigin)),
+    credentials: false,
+  }),
+);
+app.use(express.json({ limit: '1mb' }));
+app.set('trust proxy', 1);
 
 /* New uploads go straight to Supabase Storage — nothing is ever written to
    this server's disk, so a deploy with a fresh filesystem loses nothing.
@@ -81,7 +90,6 @@ app.get('/api/health', async (_req, res) => {
       ok: true,
       database: 'connected',
       storage: storageIsConfigured ? `bucket "${BUCKET}"` : 'not configured',
-      runtime: process.env.VERCEL ? 'vercel' : 'node',
     });
   } catch (error) {
     res.status(503).json({ ok: false, error: error.message });
