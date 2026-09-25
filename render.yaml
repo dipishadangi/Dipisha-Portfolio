@@ -1,0 +1,41 @@
+# Render blueprint. Import this from the dashboard (New → Blueprint) and it
+# sets the service up in one go, or copy the two commands below into an
+# existing service's settings.
+#
+# One `npm install` covers the whole repo because the root package.json
+# declares client and server as npm workspaces. Installing only the root, or
+# only the root and the client, leaves the server without its dependencies —
+# which fails at boot with "Cannot find package 'dotenv'".
+
+services:
+  - type: web
+    name: dipisha-portfolio
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+
+      # Supabase → Project Settings → Database → Connection string (URI).
+      - key: DATABASE_URL
+        sync: false
+
+      # Signs the admin login tokens. Render generates one; keep it secret.
+      # The server refuses to start in production without it.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Supabase → Project Settings → Data API / API Keys.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: DIPISHA
+
+      # How many contact-form messages one address may send per hour.
+      - key: CONTACT_RATE_LIMIT
+        value: "5"

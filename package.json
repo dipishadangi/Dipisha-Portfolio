@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "description": "Portfolio for Dipisha Chhetri — React front end, Express API, Postgres.",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
     "dev": "concurrently -n api,web -c yellow,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
@@ -13,6 +19,8 @@
     "db:setup": "npm --prefix server run db:setup",
     "db:seed": "npm --prefix server run db:seed",
     "create:admin": "npm --prefix server run create:admin",
+    "smoke": "npm --prefix server run smoke",
+    "migrate:storage": "npm --prefix server run migrate:storage",
     "lint": "npm --prefix client run lint"
   },
   "devDependencies": {

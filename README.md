@@ -1,4 +1,7 @@
-# Dipisha Chhetri — Portfolio
+
+
+The root `package.json` declares `client` and `server` as npm workspaces, so
+that one command installs all three.# Dipisha Chhetri — Portfolio
 
 A multi-page portfolio with a full admin panel. Every word, every picture, the
 order things appear in and whether they appear at all lives in the database and
@@ -30,8 +33,11 @@ gradients, no shadows, no bevels. Everything is drawn.
 ## Getting it running
 
 ```bash
-npm run install:all
+npm install
 ```
+
+The root `package.json` declares `client` and `server` as npm workspaces, so
+that single command installs all three.
 
 Copy `server/.env.example` to `server/.env` and fill it in:
 
@@ -147,18 +153,31 @@ If the database URL is ever pasted somewhere public, reset it in Supabase under
 
 ## Deploying
 
-The client builds to static files; the server hosts them automatically if
-`client/dist` exists next to it.
+The client builds to static files and the server hosts them, so the whole
+thing runs as one Node service. [`render.yaml`](render.yaml) sets it up as a
+Render blueprint; for any other host the two commands are:
 
 ```bash
-npm run build
+npm install && npm run build
 ```
 ```bash
 npm start
 ```
 
-That serves the whole thing from one process on `PORT`, with the React router
-handling deep links. Suitable for Render, Railway, Fly, or any VPS.
+**The install must be a plain root `npm install`.** Because the repo uses npm
+workspaces, that single command installs the client and the server too.
+A build command that installs only the root, or only the root and the client,
+leaves the server without its dependencies and the service dies at boot with
+`Cannot find package 'dotenv'`.
+
+Set these in the host's environment (not in a committed file):
+`DATABASE_URL`, `JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+`SUPABASE_BUCKET`. `PORT` is provided by the host. `CLIENT_ORIGIN` is only
+needed if the front end is ever served from a different domain — when the same
+service serves both, requests are same-origin and never touch CORS.
+
+`JWT_SECRET` is required in production: the server refuses to start without it
+rather than falling back to a known development value.
 
 Uploaded images go to Supabase Storage rather than this server's disk, so a
 host that gives the container a fresh filesystem on each deploy loses nothing.
